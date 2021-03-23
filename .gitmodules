@@ -1,0 +1,16 @@
+[submodule "IIC2233/syllabus"]
+	path = IIC2233/syllabus
+	url = git@github.com:IIC2233/syllabus.git
+	branch = main
+[submodule "IIC2233/contenidos"]
+	path = IIC2233/contenidos
+	url = git@github.com:IIC2233/contenidos.git
+	branch = main
+[submodule "IIC2213/Syllabus-2021-1-"]
+	path = IIC2213/Syllabus-2021-1-
+	url = git@github.com:IIC2213/Syllabus-2021-1-.git
+	branch = main
+[submodule "IIC3253/2021"]
+	path = IIC3253/2021
+	url = git@github.com:UC-IIC3253/2021.git
+	branch = main
