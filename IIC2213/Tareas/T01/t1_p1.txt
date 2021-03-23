@@ -1,0 +1,43 @@
+// Input: un string binario representando un número
+// Output: acepta si string ingresado corresponde a una codificación válida de un número binario
+// Example: acepta 10110
+// Example: rechaza un string vacío
+// Example: rechaza 0111
+//
+// Número binario tiene codificación válida
+// for Turing Machine Simulator 
+// turingmachinesimulator.com
+// by Matías Duhalde - matias.duhalde@uc.cl
+//
+// ------- States -----------|
+// q0 - initial state        |
+// q1 - reading state        |
+// q2 - check 0 state        |
+// qAccept - accepting state |
+//---------------------------|
+
+name: Número binario tiene codificación válida
+init: q0
+accept: qAccept
+
+// String vacío no es válido
+
+q0,1
+q1,1,>
+
+q1,0
+q1,0,>
+
+q1,1
+q1,1,>
+
+q1,_
+qAccept,_,-
+
+// Check case string 0
+
+q0,0
+q2,0,>
+
+q2,_
+qAccept,_,-

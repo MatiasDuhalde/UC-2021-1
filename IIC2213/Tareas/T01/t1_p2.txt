@@ -1,0 +1,182 @@
+// Input: dos strings binarios separados por el símbolo #
+// Ouput: acepta si el número representado por el segundo string binario es sucesor del primero
+// Example: acepta 1001#1010
+// Example: acepta 1111#10000
+// Example: acepta 0#1
+// Example: rechaza #1
+// Example: rechaza 01#10
+// Example: rechaza 11010#1111
+// Example: rechaza 10000#1111
+// Example: rechaza 100#00#1111
+// Example: rechaza 1101#
+//
+// Segundo número es sucesor del primero
+// for Turing Machine Simulator 
+// turingmachinesimulator.com
+// by Matías Duhalde - matias.duhalde@uc.cl
+//
+// ------- States ------------------------|
+// q0a - first initial state              |
+// q1a - first reading state              |
+// q2a - check 0 first state              |
+// q0b - second initial state             |
+// q1b - second reading state             |
+// q2b - check 0 second state             |
+// q3a - return to end of first state     |
+// q3b - start increment state            |
+// q4 - go to start of first state        |
+// q5 - start comparison state            |
+// q6 - compare character 1 left state    |
+// q7 - compare character 1 right state   |
+// q8 - compare character 0 left state    |
+// q9 - compare character 0 right state   |
+// q10 - check for more chars right state |
+// qAccept - accepting state              |
+//----------------------------------------|
+//
+// Explicación general: Valida el primer string binario y lo incrementa en uno
+// Si el segundo número es sucesor, los dos strings deben ser equivalentes
+// Se realiza la comparación y se acepta si ámbos strings resultan ser iguales
+//
+// Aspectos técnicos y mejoras:
+// - Se actualizó la codificación del binario al último enunciado subido
+// - Usa sólamente una cinta
+// - Se cambió a verificar el segundo número justo después del primero,
+//   en lugar de hacerlo al comparar, debido a los siguientes puntos
+// - Ahora la máquina no requiere de ningún carácter auxiliar extra (distinto
+//   a #) para su funcionamiento
+// - Se maneja el caso en el que el input contenga más de un carácter auxiliar
+
+name: Segundo número es sucesor del primero
+init: q0a
+accept: qAccept
+
+// Validating first string
+
+q0a,0
+q2a,0,>
+
+q2a,#
+q0b,#,>
+
+q0a,1
+q1a,1,>
+
+q1a,0
+q1a,0,>
+
+q1a,1
+q1a,1,>
+
+q1a,#
+q0b,#,>
+
+// Validating second string
+
+q0b,0
+q2b,0,>
+
+q2b,_
+q3a,_,<
+
+q0b,1
+q1b,1,>
+
+q1b,0
+q1b,0,>
+
+q1b,1
+q1b,1,>
+
+q1b,_
+q3a,_,<
+
+// Go back
+
+q3a,0
+q3a,0,<
+
+q3a,1
+q3a,1,<
+
+q3a,#
+q3b,#,<
+
+// Increment first string in one
+
+q3b,1
+q3b,0,<
+
+q3b,0
+q4,1,<
+
+q3b,_
+q4,1,<
+
+q4,0
+q4,0,<
+
+q4,1
+q4,1,<
+
+q4,_
+q5,_,>
+
+// Compare to second string
+
+// Compare character 1
+
+q5,1
+q6,_,>
+
+q6,0
+q6,0,>
+
+q6,1
+q6,1,>
+
+q6,#
+q7,#,>
+
+q7,#
+q7,#,>
+
+q7,1
+q4,#,<
+
+q4,#
+q4,#,<
+
+q4,#
+q4,#,<
+
+// Compare character 0
+
+q5,0
+q8,_,>
+
+q8,0
+q8,0,>
+
+q8,1
+q8,1,>
+
+q8,#
+q9,#,>
+
+q9,#
+q9,#,>
+
+q9,0
+q4,#,<
+
+// End comparison
+
+q5,#
+q10,#,>
+
+q10,#
+q10,#,>
+
+q10,_
+qAccept,_,-
