@@ -18,3 +18,5 @@
 	path = IIC2513/syllabus
 	url = git@github.com:IIC2513-2021-1/syllabus.git
 	branch = main
+[submodule "syllabus/"]
+	url = git@github.com:IIC2513-2021-1/syllabus-1.git
