@@ -14,7 +14,12 @@ riega(r2, tomate).
 riega(r2, oregano).
 riega(r3, oregano). % Esto es una afirmación, un átomo por sí solo.
 
-encendido(r1).
+% Enciende cualquier combinación...
+{encendido(r1); encendido(r2); encendido(r3)}.
+
+% Tal que el tomate y orégano estén regados a la vez.
+:- not regada(oregano).
+:- not regada(tomate).
 
 % encendido(R) expresa el regador R está encendido
 regada(P) :- planta(P), riega(R, P), encendido(R). % Esto es una regla
