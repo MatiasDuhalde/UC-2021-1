@@ -16,17 +16,9 @@
 	branch = main
 [submodule "IIC2513/syllabus"]
 	path = IIC2513/syllabus
-	url = git@github.com:IIC2513-2021-1/syllabus.git
+	url = git@github.com:IIC2513-2021-1/syllabus-1.git
 	branch = main
-[submodule "syllabus/"]
-	url = git@github.com:IIC2513-2021-1/syllabus-1.git
-[submodule "IIC2513/syllabus/"]
-	url = git@github.com:IIC2513-2021-1/syllabus-1.git
 [submodule "IIC2513/projects"]
 	path = IIC2513/projects
 	url = git@github.com:IIC2513-2021-1/projects.git
-	branch = main
-[submodule "IIC2613/Syllabus"]
-	path = IIC2613/Syllabus
-	url = git@github.com:UC-IIC2613/Syllabus.git
 	branch = main
