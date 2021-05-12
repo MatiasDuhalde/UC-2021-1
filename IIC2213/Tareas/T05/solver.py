@@ -201,26 +201,83 @@ def fuerzabruta(formula: Formula) -> int:
 
 def mejorado(formula):
     """
-    Checks satisfactifility of formula, using an enhanced algorithm.
+    Checks satisfactifility of formula, using an enhanced algorithm based on
+    DPLL.
 
     Arguments:
         formula: The instance of the formula to solve.
     """
-    return formula
+    def rec(current_formula, current_valuation, index):
+        # Evaluate current index to True
+        if current_valuation:
+            formula_clauses = current_formula.clauses.copy()
+            changed = False
+            for clause in current_formula.clauses:
+                clause_full = True
+                deleted_current = False
+                for prop in clause:
+                    # print(formula_clauses)
+                    value = current_valuation.get(abs(prop))
+                    if value is None:
+                        clause_full = False
+                        continue
+                    if prop < 0:
+                        value = not value
+                    # If a prop is True, the entire clause can be removed
+                    if value:
+                        changed = True
+                        deleted_current = True
+                        formula_clauses.remove(clause)
+                        # If formula_clauses is empty, that means all previous clauses were removed,
+                        # which indicates all previous clauses were True -> formula is True
+                        if not formula_clauses:
+                            return 1
+                        break
+                    # formula_clauses.remove(clause)
+                    # prop_index = clause.index(prop)
+                    # clause = clause[:prop_index] + clause[prop_index+1:]
+                    # formula_clauses.add(clause)
+                if clause_full and not deleted_current:
+                    # This valuation does not work
+                    return 0
+            if changed:
+                # Create new formula
+                current_formula = Formula(
+                    formula_type='cnf', nprops=current_formula.nprops,
+                    nclauses=current_formula.nclauses, clauses=formula_clauses,
+                    props=current_formula.props, strict_headers=current_formula.strict_headers
+                )
+        # {**current_valuation, list(current_formula.props)[index]: True}
+
+        # Evaluate current index to False
+        if len(current_valuation.keys()) < formula.nprops:
+            if rec(current_formula, {**current_valuation, list(current_formula.props)[index]: True}, index+1):
+                return 1
+            if rec(current_formula, {**current_valuation, list(current_formula.props)[index]: False}, index+1):
+                return 1
+        return 0
+    return rec(formula, dict(), 0)
 
 
 if __name__ == '__main__':
+    import time
+    total_start_time = time.time()
     # 20props satisfacibles
     # for i in range(1, 21):
-    #     result = dimacs(f'Datos T5/20props satisfacibles/uf20-0{i}.cnf')
-    #     print(fuerzabruta(result))
+    #     start_time = time.time()
+    #     formula = dimacs(f'Datos T5/20props satisfacibles/uf20-0{i}.cnf')
+    #     result = mejorado(formula)
+    #     print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
     # 50props satisfacibles
-    # for i in range(1, 11):
-    #     result = dimacs(f'Datos T5/50props insatisfacibles/uuf50-0{i}.cnf')
-    #     print(fuerzabruta(result))
-    #     break
+    for i in range(1, 11):
+        start_time = time.time()
+        formula = dimacs(f'Datos T5/50props insatisfacibles/uuf50-0{i}.cnf')
+        result = mejorado(formula)
+        print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
     # # 50props insatisfacivles
     # for i in range(1, 11):
     #     result = dimacs(f'Datos T5/50props satisfacivles/uf50-0{i}.cnf')
-    result = dimacs('unsat_test.cnf')
-    print(fuerzabruta(result))
+    #     print(mejorado(result))
+    # result = dimacs('unsat_test.cnf')
+    # print(mejorado(result))
+    print(f"------ EXECUTION TIME: {round(time.time() - total_start_time, 6)} seconds ------")
