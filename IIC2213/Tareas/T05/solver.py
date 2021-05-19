@@ -171,7 +171,7 @@ def dimacs(file_path: str, strict_headers: bool = False) -> Formula:
             if formula.clauses_count < formula.nclauses:
                 raise ValueError(
                     f"Error: Expected {formula.nclauses} clauses, found {len(formula.clauses)}")
-            return formula
+            return formula.clauses
     except FileNotFoundError as err:
         print(err)
     except IndexError:
@@ -181,21 +181,53 @@ def dimacs(file_path: str, strict_headers: bool = False) -> Formula:
     return None
 
 
-def fuerzabruta(formula: Formula) -> int:
+def evaluate(formula: set[tuple[int]], valuation: dict[int, bool]) -> int:
+    """
+    Evaluates the formula with the provided valuation and returns the value
+    of the formula
+    Arguments:
+        valuation: The dictionary describing the valuation. The key a : True
+            evaluates to the proposition a to True
+    """
+    # Solve
+    for clause in formula:
+        clause_is_true = False
+        for prop in clause:
+            value = valuation[abs(prop)]
+            if prop < 0:
+                value = not value
+            if value:
+                # If one prop is true -> The entire clause is true
+                clause_is_true = True
+                break
+        # If one clause is false -> The entire formula is false
+        if not clause_is_true:
+            return 0
+    return 1
+
+
+def fuerzabruta(formula: set[tuple[int]]) -> int:
     """
     Checks satisfactifility of formula, using a bruteforce algorithm.
 
     Arguments:
         formula: The instance of the formula to solve.
     """
+    # count props:
+    prop_set = set()
+    for clause in formula:
+        for prop in clause:
+            prop_set.add(abs(prop))
+    prop_count = len(prop_set)
+
     def rec(current_valuation, index):
-        if len(current_valuation.keys()) < formula.nprops:
-            if rec({**current_valuation, list(formula.props)[index]: True}, index+1):
+        if len(current_valuation.keys()) < prop_count:
+            if rec({**current_valuation, list(prop_set)[index]: True}, index+1):
                 return 1
-            if rec({**current_valuation, list(formula.props)[index]: False}, index+1):
+            if rec({**current_valuation, list(prop_set)[index]: False}, index+1):
                 return 1
             return 0
-        return formula.evaluate(current_valuation)
+        return evaluate(formula, current_valuation)
     return rec(dict(), 0)
 
 
@@ -207,77 +239,77 @@ def mejorado(formula):
     Arguments:
         formula: The instance of the formula to solve.
     """
-    def rec(current_formula, current_valuation, index):
-        # Evaluate current index to True
-        if current_valuation:
-            formula_clauses = current_formula.clauses.copy()
-            changed = False
-            for clause in current_formula.clauses:
-                clause_full = True
-                deleted_current = False
-                for prop in clause:
-                    # print(formula_clauses)
-                    value = current_valuation.get(abs(prop))
-                    if value is None:
-                        clause_full = False
-                        continue
-                    if prop < 0:
-                        value = not value
-                    # If a prop is True, the entire clause can be removed
-                    if value:
-                        changed = True
-                        deleted_current = True
-                        formula_clauses.remove(clause)
-                        # If formula_clauses is empty, that means all previous clauses were removed,
-                        # which indicates all previous clauses were True -> formula is True
-                        if not formula_clauses:
-                            return 1
-                        break
-                    # formula_clauses.remove(clause)
-                    # prop_index = clause.index(prop)
-                    # clause = clause[:prop_index] + clause[prop_index+1:]
-                    # formula_clauses.add(clause)
-                if clause_full and not deleted_current:
-                    # This valuation does not work
-                    return 0
-            if changed:
-                # Create new formula
-                current_formula = Formula(
-                    formula_type='cnf', nprops=current_formula.nprops,
-                    nclauses=current_formula.nclauses, clauses=formula_clauses,
-                    props=current_formula.props, strict_headers=current_formula.strict_headers
-                )
-        # {**current_valuation, list(current_formula.props)[index]: True}
-
-        # Evaluate current index to False
-        if len(current_valuation.keys()) < formula.nprops:
-            if rec(current_formula, {**current_valuation, list(current_formula.props)[index]: True}, index+1):
+    def rec(current_formula):
+        if current_formula:
+            # Set first value of first clause to true
+            new_formula = current_formula.copy()
+            possible_formula = True
+            if current_formula:
+                changed_value = None
+                for clause in current_formula:
+                    if changed_value is None:
+                        changed_value = clause[0]
+                    if changed_value in clause:
+                        new_formula.remove(clause)
+                    elif -changed_value in clause:
+                        new_formula.remove(clause)
+                        index = clause.index(-changed_value)
+                        new_clause = clause[:index] + clause[index + 1:]
+                        if new_clause:
+                            new_formula.add(new_clause)
+                        else:
+                            possible_formula = False
+                            break
+            if possible_formula and rec(new_formula):
                 return 1
-            if rec(current_formula, {**current_valuation, list(current_formula.props)[index]: False}, index+1):
+            # Otherwise set it to false:
+            new_formula = current_formula.copy()
+            possible_formula = True
+            if current_formula:
+                changed_value = None
+                for clause in current_formula:
+                    if changed_value is None:
+                        changed_value = clause[0]
+                    if -changed_value in clause:
+                        new_formula.remove(clause)
+                    elif changed_value in clause:
+                        new_formula.remove(clause)
+                        index = clause.index(changed_value)
+                        new_clause = clause[:index] + clause[index + 1:]
+                        if new_clause:
+                            new_formula.add(new_clause)
+                        else:
+                            possible_formula = False
+                            break
+            if possible_formula and rec(new_formula):
                 return 1
-        return 0
-    return rec(formula, dict(), 0)
+            return 0
+        else:
+            return 1
+    return rec(formula)
 
 
 if __name__ == '__main__':
     import time
     total_start_time = time.time()
     # 20props satisfacibles
-    # for i in range(1, 21):
-    #     start_time = time.time()
-    #     formula = dimacs(f'Datos T5/20props satisfacibles/uf20-0{i}.cnf')
-    #     result = mejorado(formula)
-    #     print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
-    # 50props satisfacibles
-    for i in range(1, 11):
+    for i in range(1, 21):
         start_time = time.time()
-        formula = dimacs(f'Datos T5/50props insatisfacibles/uuf50-0{i}.cnf')
+        formula = dimacs(f'Datos T5/20props satisfacibles/uf20-0{i}.cnf')
         result = mejorado(formula)
         print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
-    # # 50props insatisfacivles
+    # 50props insatisfacibles
     # for i in range(1, 11):
-    #     result = dimacs(f'Datos T5/50props satisfacivles/uf50-0{i}.cnf')
-    #     print(mejorado(result))
+    #     start_time = time.time()
+    #     formula = dimacs(f'Datos T5/50props insatisfacibles/uuf50-0{i}.cnf')
+    #     result = mejorado(formula)
+    #     print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
+    # # 50props satisfacivles
+    # for i in range(1, 11):
+    #     start_time = time.time()
+    #     formula = dimacs(f'Datos T5/50props satisfacivles/uf50-0{i}.cnf')
+    #     result = mejorado(formula)
+    #     print(f"RESULT: {result} | in {round(time.time() - start_time, 6)} seconds")
     # result = dimacs('unsat_test.cnf')
     # print(mejorado(result))
     print(f"------ EXECUTION TIME: {round(time.time() - total_start_time, 6)} seconds ------")
