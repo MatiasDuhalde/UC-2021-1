@@ -26,3 +26,7 @@
 	path = IIC2613/Syllabus
 	url = git@github.com:UC-IIC2613/Syllabus.git
 	branch = main
+[submodule "IIC2513/interrogation"]
+	path = IIC2513/interrogation
+	url = git@github.com:IIC2513-2021-1/interrogation.git
+	branch = main
