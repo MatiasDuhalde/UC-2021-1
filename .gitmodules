@@ -30,3 +30,6 @@
 	path = IIC2513/interrogation
 	url = git@github.com:IIC2513-2021-1/interrogation.git
 	branch = main
+[submodule "IIC3253/IIC3253-2021-1-MatiasDuhalde"]
+	path = IIC3253/IIC3253-2021-1-MatiasDuhalde
+	url = git@github.com:MatiasDuhalde/IIC3253-2021-1-MatiasDuhalde.git
