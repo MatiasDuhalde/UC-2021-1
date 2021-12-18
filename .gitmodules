@@ -33,3 +33,6 @@
 [submodule "IIC3253/IIC3253-2021-1-MatiasDuhalde"]
 	path = IIC3253/IIC3253-2021-1-MatiasDuhalde
 	url = git@github.com:MatiasDuhalde/IIC3253-2021-1-MatiasDuhalde.git
+[submodule "IIC2613/IIC2613-Tareas"]
+	path = IIC2613/IIC2613-Tareas
+	url = git@github.com:MatiasDuhalde/IIC2613-Tareas.git
