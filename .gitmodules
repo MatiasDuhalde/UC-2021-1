@@ -36,3 +36,12 @@
 [submodule "IIC2613/IIC2613-Tareas"]
 	path = IIC2613/IIC2613-Tareas
 	url = git@github.com:MatiasDuhalde/IIC2613-Tareas.git
+[submodule "IIC2513/grupo-insertfunnyname-p1"]
+	path = IIC2513/grupo-insertfunnyname-p1
+	url = git@github.com:MatiasDuhalde/grupo-insertfunnyname-p1.git
+[submodule "IIC2513/grupo-insertfunnyname-p2-backend"]
+	path = IIC2513/grupo-insertfunnyname-p2-backend
+	url = git@github.com:MatiasDuhalde/grupo-insertfunnyname-p2-backend.git
+[submodule "IIC2513/grupo-insertfunnyname-p2-frontend"]
+	path = IIC2513/grupo-insertfunnyname-p2-frontend
+	url = git@github.com:MatiasDuhalde/grupo-insertfunnyname-p2-frontend.git
